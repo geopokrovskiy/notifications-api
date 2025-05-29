@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: notifications_api
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  datasource:
+    #url: jdbc:postgresql://postgres:5432/notifications
+    url: jdbc:postgresql://localhost:5432/notifications
+    username: postgres
+    password: root
+  flyway:
+    #url: jdbc:postgresql://postgres:5432/notifications
+    url: jdbc:postgresql://localhost:5432/notifications
+    locations: classpath:db/migration
+    user: ${spring.datasource.username}
+    password: ${spring.datasource.password}
+  kafka:
+#    bootstrap-servers: kafka:9092
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: notification-consumer
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      properties:
+        schema.registry.url: http://schema-registry:8081
+        specific.avro.reader: false
+
+logging:
+  level:
+    org.springframework.web: INFO

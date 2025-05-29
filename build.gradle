@@ -1,0 +1,59 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version "$springBootVersion"
+	id 'io.spring.dependency-management' version "$springDependencyManagementVersion"
+}
+
+group = 'com.geopokrovskiy'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '21'
+}
+
+repositories {
+	mavenCentral()
+	maven {
+		url "https://nexus.gpokcicd.online/repository/commons"
+
+		credentials {
+			username = 'admin'
+			password = 'Password$'
+		}
+	}
+	maven { url 'https://packages.confluent.io/maven/' }
+}
+
+dependencies {
+	implementation 'org.springframework.session:spring-session-core'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	// DB
+	implementation "org.postgresql:postgresql:$postgreSqlVersion"
+	implementation "org.flywaydb:flyway-core:$flywayDbVersion"
+
+	// KAFKA
+	implementation 'org.springframework.kafka:spring-kafka'
+	implementation "io.confluent:kafka-avro-serializer:${kafkaAvroSerializer}"
+
+	// MAIL
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	//LOMBOK
+	implementation "org.projectlombok:lombok:$lombokVersion"
+	annotationProcessor "org.projectlombok:lombok"
+
+	//MAPSTRUCT
+	implementation "org.mapstruct:mapstruct:$mapStructVersion"
+	annotationProcessor "org.mapstruct:mapstruct-processor:$mapStructVersion"
+
+	//COMMON
+	implementation "com.geopokrovskiy:commons:${commonsVersion}"
+
+	//TEST
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+test{
+	useJUnitPlatform()
+}
