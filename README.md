@@ -1,0 +1,1 @@
+This is a small demo application which uses Kafka message broker for messages consuming and subsequent sending of these messages to an SMTP server. The Docker pile can be launched in Windows environment using a ./deploy.ps1 script.
