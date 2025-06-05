@@ -1,9 +1,11 @@
 server:
-    port: 8380
+  port: 8380
 
 spring:
   application:
     name: notifications_api
+  config:
+    import: classpath:custom.properties
   jpa:
     show-sql: true
     hibernate:
@@ -15,8 +17,8 @@ spring:
     url: jdbc:postgresql://postgres:5432/notifications
     #url: jdbc:postgresql://localhost:5432/notifications
     username: user
-   # username: postgres
-   # password: root
+    # username: postgres
+    # password: root
     password: password
   flyway:
     url: jdbc:postgresql://postgres:5432/notifications
@@ -27,13 +29,15 @@ spring:
   kafka:
     bootstrap-servers: kafka:9092
     consumer:
-        group-id: notification-consumer
-        auto-offset-reset: earliest
-        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-        value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
-        properties:
-          schema.registry.url: http://schema-registry:8081
-          specific.avro.reader: false
+      group-id: notification-consumer
+      auto-offset-reset: earliest
+      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        schema.registry.url: http://schema-registry:8081
+        specific.avro.reader: false
+        spring.deserializer.value.delegate.class: io.confluent.kafka.serializers.KafkaAvroDeserializer
+        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
   mail:
     host: smtp
     port: 1025

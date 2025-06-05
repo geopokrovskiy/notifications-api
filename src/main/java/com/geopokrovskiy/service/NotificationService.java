@@ -5,6 +5,8 @@ import com.geopokrovskiy.entity.NotificationStatus;
 import com.geopokrovskiy.repository.NotificationRepository;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Data
@@ -19,13 +21,21 @@ public class NotificationService {
             return notificationRepository.save(notification);
         } catch (Exception e) {
             log.error(e.getMessage());
+            log.info("Notification has not been saved");
+            throw new RuntimeException(e);
         }
-        log.info("Notification has not been saved");
-        return notification;
     }
 
     public Notification finalizeNotification(Notification notification) {
         notification.setNotificationStatus(NotificationStatus.COMPLETED);
         return notificationRepository.save(notification);
+    }
+
+    public Page<Notification> getNotifications(Pageable pageable) {
+        return notificationRepository.findAll(pageable);
+    }
+
+    public Notification getNotificationById(Long id) {
+        return notificationRepository.findById(id).orElse(null);
     }
 }

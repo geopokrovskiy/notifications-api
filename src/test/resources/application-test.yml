@@ -9,27 +9,24 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   datasource:
-    #url: jdbc:postgresql://postgres:5432/notifications
-    url: jdbc:postgresql://localhost:5432/notifications
+    url: jdbc:postgresql:///notifications?TC_IMAGE_TAG=17-alpine
     username: postgres
     password: root
   flyway:
-    #url: jdbc:postgresql://postgres:5432/notifications
-    url: jdbc:postgresql://localhost:5432/notifications
-    locations: classpath:db/migration
+    url: jdbc:postgresql:///notifications?TC_IMAGE_TAG=17-alpine
+    locations: classpath:db/test-migration
     user: ${spring.datasource.username}
     password: ${spring.datasource.password}
   kafka:
-#    bootstrap-servers: kafka:9092
-    bootstrap-servers: localhost:9092
     consumer:
       group-id: notification-consumer
       auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
       properties:
-        schema.registry.url: http://schema-registry:8081
         specific.avro.reader: false
+        spring.deserializer.value.delegate.class: io.confluent.kafka.serializers.KafkaAvroDeserializer
+        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
 
 logging:
   level:

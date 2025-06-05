@@ -7,7 +7,6 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.angus.mail.smtp.SMTPTransport;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -21,8 +20,12 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
-    @Autowired
     private final MailProperties mailProperties;
+
+    public EmailService(JavaMailSender mailSender, MailProperties mailProperties) {
+        this.mailSender = mailSender;
+        this.mailProperties = mailProperties;
+    }
 
     public int sendEmail(String subject, String destination, String message) {
         int code;
@@ -51,5 +54,13 @@ public class EmailService {
             throw new RuntimeException(e);
         }
         return code;
+    }
+
+    public void checkEmailStatus(int statusCode) {
+        if (statusCode == 250) {
+            log.info("Email sent successfully");
+        } else {
+            log.error("Failed to send email. Status code: {}", statusCode);
+        }
     }
 }

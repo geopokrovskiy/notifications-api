@@ -16,7 +16,6 @@ services:
       KAFKA_NUM_PARTITIONS: 1
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       CLUSTER_ID: "abcdefghijklmnopqrstuv"
-
     volumes:
       - kafka-data:/var/lib/kafka/data
     ports:
@@ -26,7 +25,8 @@ services:
     image: confluentinc/cp-schema-registry:7.6.0
     container_name: schema-registry
     depends_on:
-      - kafka
+      kafka:
+        condition: service_started
     environment:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:9092
@@ -40,6 +40,11 @@ services:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: notifications
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U user -d notifications" ]
+      interval: 5s
+      timeout: 30s
+      retries: 5
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
@@ -51,8 +56,8 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - kafka
-      - schema-registry
+      kafka:
+        condition: service_started
     environment:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
@@ -68,8 +73,10 @@ services:
       KAFKA_REST_SCHEMA_REGISTRY_URL: http://schema-registry:8081
       KAFKA_REST_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:9092
     depends_on:
-      - kafka
-      - schema-registry
+      kafka:
+        condition: service_started
+
+
 
   notifications-api:
     build:
@@ -78,9 +85,12 @@ services:
     ports:
       - "8380:8380"
     depends_on:
-      - kafka
-      - schema-registry
-      - postgres
+      kafka:
+        condition: service_started
+      postgres:
+        condition: service_started
+      schema-registry:
+        condition: service_started
 
   smtp:
     image: axllent/mailpit
